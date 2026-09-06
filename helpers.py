@@ -2,6 +2,8 @@ import requests
 import logging
 import time
 
+logging.basicConfig(level=logging.INFO)
+
 url = "https://web-cdn.api.bbci.co.uk/xd/content-collection/07cedf01-f642-4b92-821f-d7b324b8ba73"
 
 headers = {
@@ -47,7 +49,7 @@ class Helper:
                     atmp += 1
                     logging.info("START")
     
-                
+        return response           
                 
 
 
