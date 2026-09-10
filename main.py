@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 helper = Helper()
 
 messages = []
-datas = []
+data = []
 
 #========DATABASE AUTHORIZATION=======
 
@@ -42,8 +42,7 @@ pages = 6
 #================================ LOOP THROUGH PAGES =======================
 
 for page in range(1, pages):
-    data = []
-
+    
     response = helper.load_site(page)
     logging.info(f"Starting SCRAPING page {page}")
 
@@ -62,11 +61,7 @@ for page in range(1, pages):
             image = news.get("indexImage", {}).get("model", {}).get("blocks").get("src")
         except:
             continue
-
-        #print(title)
-        #print(summary)
-        #print(d_link)
-        #print(image)
+        
 
 
         if d_link not in old_data:
@@ -74,12 +69,18 @@ for page in range(1, pages):
             message = helper.email_container(title, summary, d_link, image)
             messages.append(message)
 
-            info = ((title, summary, d_link))
-            data.append(info)
+            #data.append((title, summary, d_link))
+            info = (title, summary, d_link)
+            query = '''
+INSERT INTO bbc(Title, Summary, Detail_link)
+VALUES(%s, %s, %s)
+'''
+            cursor.execute(query, info)
+            conn.commit()
         else:
             pass
-
-    datas.extend(data)
+    #datas.extend(data)
+    
     logging.info(f"Done with page {page}")
     time.sleep(random.uniform(2.5, 4.5))
 
@@ -89,6 +90,7 @@ full_message = "\n".join(messages)
 email_body = helper.email_body(full_message)
 
 if messages:
+    print("yess")
     helper.send_email(
         subject="BBC NEWS UPDATE",
         body = email_body
@@ -96,19 +98,14 @@ if messages:
 else:
     logging.info("No New News was SEEN")
 
-input("do you want to continue")
-query = "DELETE FROM bbc"
+input("Do you want to ...")
+query = "DELETE FROM bbc WHERE DATE(Date_scraped) != CURDATE()"
 cursor.execute(query)
+conn.commit()
 
 cursor.execute("SET sql_safe_updates = 1")
 
-query1 = '''
-INSERT INTO bbc(Title, Summary, Detail_link)
-VALUES(%s, %s, %s)
-'''
-cursor.executemany(query1, datas)
-conn.commit()
-logging.info("New NEWS info is PUSHED into DATAbase")
+logging.info("Scraping IS SUCCESSFUL")
 
 
 
