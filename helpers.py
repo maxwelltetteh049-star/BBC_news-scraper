@@ -4,12 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 import time
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
-password = os.getenv("APP_PASSWORD")
-logging.basicConfig(level=logging.INFO)
 
 url = "https://web-cdn.api.bbci.co.uk/xd/content-collection/07cedf01-f642-4b92-821f-d7b324b8ba73"
 
@@ -43,7 +38,9 @@ class Helper:
                     break
                 else:
                     logging.warning(f"STATUS CODE ERROR : {response.status_code}=={response.reason}")
-                    input("if you want to continue, click any key")
+                    if response.status_code == 429:
+                        print("Too many requests")
+                        time.sleep(100)
             except requests.exceptions.Timeout:
                 logging.info("Requests loading timeout")
                 time.sleep(4)
@@ -105,7 +102,7 @@ class Helper:
         password = "APP_PASSWORD"
         receiver = "RECEIVER_EMAIL"
 
-        msg = MIMEMultipart("ailternative")
+        msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = sender
         msg["To"] = receiver

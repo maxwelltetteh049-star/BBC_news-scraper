@@ -1,0 +1,5 @@
+#These are the python packages
+#To run the scraper, install them
+
+requests
+mysql-connector-python

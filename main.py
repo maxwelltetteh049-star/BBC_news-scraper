@@ -98,7 +98,6 @@ if messages:
 else:
     logging.info("No New News was SEEN")
 
-input("Do you want to ...")
 query = "DELETE FROM bbc WHERE DATE(Date_scraped) != CURDATE()"
 cursor.execute(query)
 conn.commit()
